@@ -65,10 +65,12 @@ public abstract class main implements ActionListener{
 		String Username = username.getText();
     	String Password1 = Password.getText();
     	HashMap credentials = check_credentials(Username, Password1);
-		
+		System.out.print(credentials);
 		// Login button action
 		login.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	String Username = username.getText();
+            	String Password1 = Password.getText();
             	if(credentials.containsKey(Username) && credentials.get(Username).equals(Password1))
             		JOptionPane.showMessageDialog(null, "Login correct");
             	else
@@ -81,13 +83,18 @@ public abstract class main implements ActionListener{
             public void actionPerformed(ActionEvent e) {
             	String Username = username.getText();
             	String Password1 = Password.getText();
-            	try {
-					create_account(Username, Password1);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-            	JOptionPane.showMessageDialog(null, "Account created");
+            	if(!credentials.containsKey(Username)) {
+	            	try {
+						create_account(Username, Password1);
+						credentials.put(Username, Password1);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	            	JOptionPane.showMessageDialog(null, "Account created");
+	            }
+            	else
+            		JOptionPane.showMessageDialog(null, "Username already exist");
             }
         });
 		frame.setVisible(true);
@@ -97,7 +104,6 @@ public abstract class main implements ActionListener{
 		HashMap<String, String> credentials = new HashMap<String, String>();
 		File loginf = new File("users.txt");
   		try (Scanner read = new Scanner(loginf)) {
-  			read.useDelimiter("\\n|,");
   			while(read.hasNext()){
   			   String user = read.next();
   			   String pass = read.next();
@@ -109,12 +115,12 @@ public abstract class main implements ActionListener{
 				//e1.printStackTrace();
 			}
 		return credentials;
-	}
+	  }
 	  static void create_account(String username, String password1) throws IOException {
 		File fileName = new File("users.txt");
 		FileWriter fw = new FileWriter(fileName, true);
 	    BufferedWriter bw = new BufferedWriter(fw);
-	    String formatted = username + "," + password1;
+	    String formatted = username + "\n" + password1;
 	    bw.newLine();
 	    bw.write(formatted);
 	    bw.newLine();
